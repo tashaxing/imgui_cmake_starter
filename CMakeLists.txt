@@ -18,7 +18,7 @@ file(GLOB SRC
     ./imgui-1.83/*.cpp
 )
 
-# set specific source for platform
+# set specific source and other option for platform
 if (WIN32)
     file (GLOB PLATFORM_SRC
         ./imgui-1.83/backends/imgui_impl_win32.*
@@ -32,6 +32,12 @@ elseif (APPLE)
         ./src/mac/main.cpp
     )
 elseif (UNIX AND NOT APPLE)
+    add_definitions(-DIMGUI_IMPL_OPENGL_LOADER_GL3W)
+
+    include_directories(
+        ${CMAKE_CURRENT_SOURCE_DIR}/imgui-1.83/examples/libs/gl3w # for GL/gl3w.h
+    )
+
     file (GLOB PLATFORM_SRC
         ./imgui-1.83/examples/libs/gl3w/GL/gl3w.*
         ./imgui-1.83/backends/imgui_impl_glfw.*
@@ -54,6 +60,8 @@ elseif (APPLE)
 elseif (UNIX AND NOT APPLE)
 # should install glfw first: sudo apt install libglfw3-dev
 target_link_libraries(${PROJECT_NAME}
-    glfw3
+    GL
+    glfw # use this lib name
+    dl
 )
 endif()
