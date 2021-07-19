@@ -32,8 +32,13 @@ elseif (APPLE)
         ./src/mac/main.cpp
     )
 elseif (UNIX AND NOT APPLE)
+    file (GLOB PLATFORM_SRC
+        ./imgui-1.83/examples/libs/gl3w/GL/gl3w.*
+        ./imgui-1.83/backends/imgui_impl_glfw.*
+        ./imgui-1.83/backends/imgui_impl_opengl3.*
+        ./src/linux/main.cpp
+    )
 endif()
-
 
 # generate binary
 add_executable(${PROJECT_NAME} ${SRC} ${PLATFORM_SRC})
@@ -45,8 +50,10 @@ target_link_libraries(${PROJECT_NAME}
 	d3dcompiler.lib
 	dxgi.lib
 )
-elseif (UNIX)
+elseif (APPLE)
+elseif (UNIX AND NOT APPLE)
 # should install glfw first: sudo apt install libglfw3-dev
-target_link_libraries(${PROJECT_NAME}	
+target_link_libraries(${PROJECT_NAME}
+    glfw3
 )
 endif()
