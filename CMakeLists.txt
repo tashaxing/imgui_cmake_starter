@@ -12,30 +12,31 @@ include_directories(
 	${CMAKE_CURRENT_SOURCE_DIR}/imgui-1.83/backends
 )
 
-# set source
+# set common source
 file(GLOB SRC
-	./imgui-1.83/*.h
-	./imgui-1.83/*.cpp
-
-	# backends for different platform
-	if (WIN32)
-		./imgui-1.83/backends/imgui_impl_win32.*
-		./imgui-1.83/backends/imgui_impl_dx12.*
-	elseif (APPLE)
-	elseif (UNIX AND NOT APPLE)
-	endif()
-
-	# main entry
-	if (WIN32)
-		src/win/main.cpp
-#	elseif (APPLE)
-#	elseif (UNIX)
-#		src/linux/main.cpp
-	endif()
+    ./imgui-1.83/*.h
+    ./imgui-1.83/*.cpp
 )
 
+# set specific source for platform
+if (WIN32)
+    file (GLOB PLATFORM_SRC
+        ./imgui-1.83/backends/imgui_impl_win32.*
+        ./imgui-1.83/backends/imgui_impl_dx12.*
+        ./src/win/main.cpp
+    )
+elseif (APPLE)
+    file (GLOB PLATFORM_SRC
+        ./imgui-1.83/backends/imgui_impl_metal.*
+        ./imgui-1.83/backends/imgui_impl_osx.*
+        ./src/mac/main.cpp
+    )
+elseif (UNIX AND NOT APPLE)
+endif()
+
+
 # generate binary
-add_executable(${PROJECT_NAME} ${SRC})
+add_executable(${PROJECT_NAME} ${SRC} ${PLATFORM_SRC})
 
 # link lib
 if (WIN32)
