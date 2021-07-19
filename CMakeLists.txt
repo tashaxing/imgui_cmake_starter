@@ -46,6 +46,7 @@ target_link_libraries(${PROJECT_NAME}
 	dxgi.lib
 )
 elseif (UNIX)
+# should install glfw first: sudo apt install libglfw3-dev
 target_link_libraries(${PROJECT_NAME}	
 )
 endif()
