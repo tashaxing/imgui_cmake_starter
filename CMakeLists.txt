@@ -25,13 +25,8 @@ if (WIN32)
         ./imgui-1.83/backends/imgui_impl_dx12.*
         ./src/win/main.cpp
     )
-elseif (APPLE)
-    file (GLOB PLATFORM_SRC
-        ./imgui-1.83/backends/imgui_impl_metal.*
-        ./imgui-1.83/backends/imgui_impl_osx.*
-        ./src/mac/main.cpp
-    )
-elseif (UNIX AND NOT APPLE)
+elseif (UNIX)
+    # support both mac and linux
     add_definitions(-DIMGUI_IMPL_OPENGL_LOADER_GL3W)
 
     include_directories(
@@ -42,7 +37,7 @@ elseif (UNIX AND NOT APPLE)
         ./imgui-1.83/examples/libs/gl3w/GL/gl3w.*
         ./imgui-1.83/backends/imgui_impl_glfw.*
         ./imgui-1.83/backends/imgui_impl_opengl3.*
-        ./src/linux/main.cpp
+        ./src/unix/main.cpp
     )
 endif()
 
@@ -52,13 +47,14 @@ add_executable(${PROJECT_NAME} ${SRC} ${PLATFORM_SRC})
 # link lib
 if (WIN32)
 target_link_libraries(${PROJECT_NAME}	
-	d3d12.lib
-	d3dcompiler.lib
-	dxgi.lib
+    d3d12.lib
+    d3dcompiler.lib
+    dxgi.lib
 )
-elseif (APPLE)
-elseif (UNIX AND NOT APPLE)
-# should install glfw first: sudo apt install libglfw3-dev
+elseif (UNIX)
+# support both mac and linux,should install glfw first
+# mac: brew install glfw3
+# linux: sudo apt install libglfw3-dev
 target_link_libraries(${PROJECT_NAME}
     GL
     glfw # use this lib name
