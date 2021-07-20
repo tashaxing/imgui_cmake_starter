@@ -2,15 +2,20 @@ cmake_minimum_required(VERSION 3.0)
 
 project(imgui_cmake_starter)
 
-if (UNIX)
-	add_definitions(-std=c++11)
-endif()
-
 # add header path
 include_directories(
 	${CMAKE_CURRENT_SOURCE_DIR}/imgui-1.83
 	${CMAKE_CURRENT_SOURCE_DIR}/imgui-1.83/backends
 )
+
+if (APPLE)
+    # for <GLFW/glfw3.h>
+    include_directories(
+        /usr/local/include
+        /opt/local/include
+        /opt/homebrew/include
+    )
+endif()
 
 # set common source
 file(GLOB SRC
@@ -41,23 +46,47 @@ elseif (UNIX)
     )
 endif()
 
+# add link path
+if (APPLE)
+    link_directories(
+        /usr/local/lib
+        /opt/local/lib
+        /opt/homebrew/lib
+    )
+endif()
+
 # generate binary
 add_executable(${PROJECT_NAME} ${SRC} ${PLATFORM_SRC})
 
-# link lib
+# link lib, should install glfw first or prebuild lib and embed in project
 if (WIN32)
-target_link_libraries(${PROJECT_NAME}	
-    d3d12.lib
-    d3dcompiler.lib
-    dxgi.lib
-)
-elseif (UNIX)
-# support both mac and linux,should install glfw first
-# mac: brew install glfw3
-# linux: sudo apt install libglfw3-dev
-target_link_libraries(${PROJECT_NAME}
-    GL
-    glfw # use this lib name
-    dl
-)
+    target_link_libraries(${PROJECT_NAME}
+        d3d12.lib
+        d3dcompiler.lib
+        dxgi.lib
+    )
+elseif (APPLE)
+    # mac: brew install glfw3
+    find_library(OPENGL_LIBRARY OpenGL REQUIRED)
+    find_library(COCOA_LIBRARY Cocoa REQUIRED)
+    find_library(IOKIT_LIBRARY IOKit REQUIRED)
+    find_library(COREVID_LIBRARY CoreVideo REQUIRED)
+    message(${COCOA_LIBRARY})
+    message(${IOKIT_LIBRARY})
+    message(${COREVID_LIBRARY})
+
+    target_link_libraries(${PROJECT_NAME}
+        ${OPENGL_LIBRARY}
+        ${COCOA_LIBRARY}
+        ${IOKIT_LIBRARY}
+        ${COREVID_LIBRARY}
+        glfw # use this lib name
+    )
+elseif (UNIX AND NOT APPLE)
+    # linux: sudo apt install libglfw3-dev
+    target_link_libraries(${PROJECT_NAME}
+        GL
+        glfw # use this lib name
+        dl
+    )
 endif()
